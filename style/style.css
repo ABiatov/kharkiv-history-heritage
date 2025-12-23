@@ -1,0 +1,163 @@
+:root {
+	--clWhite: #ffffff;
+	--clBlack: #000000;
+	--clRed: #ff0000;
+	--clYellow: #ffffcc;
+	--clBtnOn: #f5f5f5;
+	--clBtnOff: #bfbfbf;
+	--clBtnHover: #ffffff;
+	--clGray: #cccccc;
+	--clBack: #737373;
+	--clBorder: #5b5b5b;
+	--overLeaflet: 9401;
+	--btnCollapse: url('btnCollapse.png');
+	--btnExpande: url('btnExpande.png');
+	--btnOn: url('on.png');
+	--btnOff: url('off.png');
+	}
+/* ================================================================= */
+.visOn{
+	visibility: visible;
+	display: block;
+	}
+.visOff{
+	visibility: hidden;
+	display: none;
+	}
+/* ================================================================= */
+html {
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
+	}
+body {
+	margin : 0;
+	padding : 0;
+	background: var(--clWhite);
+	}
+/* ================================================================= */	
+#pnlTop{
+	position: absolute;
+	width: 70%;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	background: var(--clBtnOff);
+	font: bold 20px  sans-serif;
+	line-height: 40px;
+	}
+#map{
+	position: absolute;
+	width: 100%;
+	top: 40px;
+	}
+#pnlLeft{
+	position: absolute;
+	width: 30%;	
+	left: 70%;
+	top: 0%;
+	overflow: auto;
+	z-index: var(--overLeaflet);
+	background: var(--clWhite);
+	cursor: default;
+	}
+	.pnlLeftOpen {
+		height: 950px;
+		}
+	.pnlLeftClose {
+		height: 40px;
+		}
+/* ================================================================= */	
+#pnlFilter {
+	position: absolute;
+	width: 100%;
+	background: var(--clBtnOn);
+	cursor: default;
+	}
+	.pnlFilterCollapse {
+		height: 40px;
+		}
+	.pnlFilterExpand {
+		height: 750px;
+		}
+	#pnlFilterHead {
+		background-color: var(--clBack);
+		background-size: 36px;
+		text-align: center;
+		font: bold 20px  sans-serif;
+		line-height: 40px;
+		color: var(--clWhite);
+		background-position: left 20%;
+		}
+		.pnlFilterHeadCollapse {
+			height: 40px;
+			top: 0px;
+			background: var(--btnCollapse) no-repeat;
+			}
+		.pnlFilterHeadExpand {
+			height: 40px;
+			background: var(--btnExpande) no-repeat;
+			}		
+	#pnlFilterBody {
+		height: 750px;
+		background: var(--clWhite);
+		padding: 20px;
+		}	
+		.pnlFilterSubBody {
+			font: bold 18px  sans-serif;
+			}
+		.filter {
+			border-radius: 10px;
+			height: 5%;
+			line-height: 40px;
+			cursor: default;
+			padding-left: 40px;
+			
+			}
+			.filter:hover {
+				background-color: var(--clYellow);
+				background-position: left 40%;
+				}
+			.filterOn {
+				background: var(--btnOn) no-repeat;
+				background-position: left 40%;
+				color: var(--clBlack);
+				}
+			.filterOff {
+				background: var(--btnOff) no-repeat;
+				background-position: left 40%;
+				color: var(--clBack);
+				}
+
+			.filterDiv {
+				height: 20px;
+				}
+/* ================================================================= */	
+#pnlInfo{
+	position: absolute;
+	width: 100%;	
+	height: 140%;
+	background: var(--clWhite);
+	}
+	.pnlInfoTop {
+		top: 40px;
+		}
+	.pnlInfoBottom {
+		top: 800px;
+		}
+	#pnlInfoHead {
+		border-top: 2px solid var(--clBorder);
+		background-color: var(--clBack);
+		background-size: contain;
+		text-align: center;
+		font: bold 20px  sans-serif;
+		line-height: 40px;
+		color: var(--clWhite);
+		}
+	#pnlInfoBody {
+		padding: 30px;
+		}
+	img {
+		width: 100%;
+		}
+/* ================================================================= */	
