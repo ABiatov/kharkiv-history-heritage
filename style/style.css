@@ -34,38 +34,79 @@ body {
 	margin : 0;
 	padding : 0;
 	background: var(--clWhite);
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	overflow: hidden;
 	}
 /* ================================================================= */	
 #pnlTop{
-	position: absolute;
-	width: 70%;
+	display: flex;
+	align-items: center;
+	gap: 12px;
 	height: 40px;
-	line-height: 40px;
-	text-align: center;
+	padding: 0 12px;
 	background: var(--clBtnOff);
 	font: bold 20px  sans-serif;
+	box-sizing: border-box;
+	width: 100%;
+	}
+#pnlTopTitle{
+	flex: 1;
+	text-align: center;
 	line-height: 40px;
 	}
-#map{
-	position: absolute;
+#btnSidebarToggle{
+	height: 28px;
+	min-width: 80px;
+	background: var(--clBack);
+	color: var(--clWhite);
+	border: 1px solid var(--clBorder);
+	border-radius: 6px;
+	cursor: pointer;
+	font: bold 14px sans-serif;
+	}
+#btnSidebarToggle:hover{
+	background: var(--clBtnHover);
+	color: var(--clBlack);
+	}
+#appLayout{
+	display: flex;
+	height: calc(100vh - 40px);
 	width: 100%;
-	top: 40px;
+	overflow: hidden;
+	}
+#map{
+	position: relative;
+	flex: 1 1 auto;
+	height: calc(100vh - 40px);
 	}
 #pnlLeft{
-	position: absolute;
-	width: 30%;	
-	left: 70%;
-	top: 0%;
-	overflow: auto;
+	position: relative;
+	display: block;
+	height: 100%;
+	/* overflow: hidden; */
+	overflow-y: auto;
+	overflow-x: hidden;
 	z-index: var(--overLeaflet);
 	background: var(--clWhite);
 	cursor: default;
+	transition: width 0.3s ease;
+	border-right: 1px solid var(--clBorder);
 	}
 	.pnlLeftOpen {
-		height: 950px;
+		width: 340px;
+		min-width: 260px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		pointer-events: auto;
 		}
 	.pnlLeftClose {
-		height: 40px;
+		width: 0;
+		min-width: 0;
+		overflow: hidden;
+		pointer-events: none;
+		border-right: none;
 		}
 /* ================================================================= */	
 #pnlFilter {
@@ -74,45 +115,24 @@ body {
 	background: var(--clBtnOn);
 	cursor: default;
 	}
-	.pnlFilterCollapse {
-		height: 40px;
-		}
 	.pnlFilterExpand {
-		height: 750px;
-		}
-	#pnlFilterHead {
-		background-color: var(--clBack);
-		background-size: 36px;
-		text-align: center;
-		font: bold 20px  sans-serif;
-		line-height: 40px;
-		color: var(--clWhite);
-		background-position: left 20%;
-		}
-		.pnlFilterHeadCollapse {
-			height: 40px;
-			top: 0px;
-			background: var(--btnCollapse) no-repeat;
-			}
-		.pnlFilterHeadExpand {
-			height: 40px;
-			background: var(--btnExpande) no-repeat;
-			}		
+		height: auto;
+	}
 	#pnlFilterBody {
-		height: 750px;
 		background: var(--clWhite);
 		padding: 20px;
-		}	
+		height: auto;
+	}	
 		.pnlFilterSubBody {
 			font: bold 18px  sans-serif;
 			}
 		.filter {
 			border-radius: 10px;
-			height: 5%;
-			line-height: 40px;
+			min-height: 40px;
+			height: auto;
+			line-height: normal;
 			cursor: default;
-			padding-left: 40px;
-			
+			padding: 12px 12px 0px 40px;
 			}
 			.filter:hover {
 				background-color: var(--clYellow);
@@ -134,17 +154,21 @@ body {
 				}
 /* ================================================================= */	
 #pnlInfo{
-	position: absolute;
-	width: 100%;	
-	height: 140%;
+	position: fixed;
+	right: 0;
+	top: 40px;
+	width: 25vw;
+	min-width: 260px;
+	max-width: 420px;
+	max-height: calc(100vh - 40px);
 	background: var(--clWhite);
+	border-left: 1px solid var(--clBorder);
+	box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+	overflow-y: auto;
+	z-index: calc(var(--overLeaflet) + 1);
+	display: flex;
+	flex-direction: column;
 	}
-	.pnlInfoTop {
-		top: 40px;
-		}
-	.pnlInfoBottom {
-		top: 800px;
-		}
 	#pnlInfoHead {
 		border-top: 2px solid var(--clBorder);
 		background-color: var(--clBack);
@@ -153,6 +177,12 @@ body {
 		font: bold 20px  sans-serif;
 		line-height: 40px;
 		color: var(--clWhite);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		padding: 0 16px;
+		box-sizing: border-box;
 		}
 	#pnlInfoBody {
 		padding: 30px;
@@ -160,4 +190,43 @@ body {
 	img {
 		width: 100%;
 		}
+.pnlInfoClose{
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 28px;
+	height: 28px;
+	border: 1px solid var(--clBorder);
+	border-radius: 50%;
+	background: var(--clBtnOff);
+	color: var(--clWhite);
+	cursor: pointer;
+	font: bold 18px sans-serif;
+	line-height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	}
+.pnlInfoClose:hover{
+	background: var(--clBtnHover);
+	color: var(--clBlack);
+	}
+@media (max-width: 768px){
+	.pnlLeftOpen{
+		width: 50vw;
+		min-width: 0;
+		}
+	#pnlInfo{
+		top: 80px;
+		width: 50vw;
+		max-width: none;
+		}
+	#pnlTop{
+		height: 80px;
+		}
+	#map{
+		height: calc(100vh - 80px);
+		}
+}
 /* ================================================================= */	
