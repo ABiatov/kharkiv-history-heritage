@@ -32,15 +32,41 @@ function changeClass(elem, oldclass, newclass){
 function keepCLASS(IDelem, nameClass){
 	return elemID(IDelem).classList.contains(nameClass)
 	}
+function refreshMapSize(){
+	if(typeof map !== 'undefined'){
+		setTimeout(()=>{map.invalidateSize()}, 250)
+		}
+	}
+function openSidebar(){
+	changeClass('pnlLeft', 'pnlLeftClose', 'pnlLeftOpen')
+	elemID('btnSidebarToggle').setAttribute('aria-expanded','true')
+	if(keepCLASS('pnlFilterBody','visOff')){
+		changeClass('pnlFilterBody','visOff','visOn')
+		}
+	refreshMapSize()
+	}
+function closeSidebar(){
+	changeClass('pnlLeft', 'pnlLeftOpen', 'pnlLeftClose')
+	elemID('btnSidebarToggle').setAttribute('aria-expanded','false')
+	refreshMapSize()
+	}
+function toggleSidebar(){
+	if(keepCLASS('pnlLeft', 'pnlLeftOpen')){
+		closeSidebar()
+		}else{
+			openSidebar()
+			}
+	}
+function closeInfoPanel(){
+	changeClass('pnlInfo', 'visOn', 'visOff')
+	}
 //=====================================================================
 //                	  CREATE ELEMENT FOR FILTRATION							// Need in optimisation!
 //=====================================================================
 let filterElemArr = []
 function createElemFilter(){
-	newElem('div', 'pnlFilter', 'pnlFilterCollapse', 'pnlLeft')
-	newElem('div', 'pnlFilterHead', 
-								'pnlFilterHeadCollapse', 'pnlFilter')
-	newElem('div', 'pnlFilterBody', 'visOff', 'pnlFilter')
+	newElem('div', 'pnlFilter', 'pnlFilterExpand', 'pnlLeft')
+	newElem('div', 'pnlFilterBody', 'visOn', 'pnlFilter')
 	newElem('div', 'pnlFilterBodyType', 
 								'pnlFilterSubBody', 'pnlFilterBody')
 	newElem('div', 'type1', 'filter filterOn', 'pnlFilterBody')
@@ -66,7 +92,6 @@ function createElemFilter(){
 								'pnlFilterSubBody', 'pnlFilterBody')
 	newElem('div', 'category1', 'filter filterOff', 'pnlFilterBody')
 //---------------------------------------------------------------------
-	elemID('pnlFilterHead').innerHTML = 'Фільтр'
 	elemID('pnlFilterBodyType').innerHTML = 'Тип об\'єкта'
 	elemID('type1').innerHTML = 'Комплекс будівель'
 	elemID('type2').innerHTML = 'Могила'
@@ -113,11 +138,13 @@ createElemFilter()
 const avScreenH = document.documentElement.clientHeight
 const avScreenW = window.screen.width	
 elemID('map').style.height = (avScreenH-40) + 'px'
-newElem('div', 'pnlInfo', 'pnlInfoTop visOff', 'pnlLeft')
+newElem('div', 'pnlInfo', 'pnlInfoPanel visOff', 'appLayout')
 newElem('div', 'pnlInfoHead', 'pnl', 'pnlInfo')
 newElem('div', 'pnlInfoBody', 'pnl', 'pnlInfo')
-elemID('pnlInfoHead').innerHTML = 'Інформація'
-elemID('pnlFilterHead').innerHTML = 'Фільтр'
+elemID('pnlInfoHead').textContent = 'Інформація'
+newElem('button', 'pnlInfoClose', 'pnlInfoClose', 'pnlInfoHead')
+elemID('pnlInfoClose').textContent = '×'
+elemID('pnlInfoClose').setAttribute('aria-label', 'Закрити вікно')
 //=====================================================================
 //                	 	 LEAFLET CUSTOMS
 //=====================================================================
@@ -146,7 +173,8 @@ const attribute = 'Created by <a href="https://www.linkedin.com/in/anton-biatov/
 										' target="_blank">Sergey Golubev</a> | ' +
 										'<a href="https://github.com/ABiatov/kharkiv-history-heritage"'+
 										' target="_blank">Code on GitHub</a>'
-let map = L.map('map').setView([50, 36], 10)
+const defaultView = {center:[49.9, 36], zoom:10}
+let map = L.map('map', {zoomControl:false}).setView(defaultView.center, defaultView.zoom)
 	map.attributionControl.addAttribution(attribute)
 let leafOSM = wmsOSM.addTo(map)
 let leafSat = L.layerGroup([wmsSat, wmsLabels]);
@@ -156,8 +184,34 @@ var baseMaps = {
     "Imagery with Labels": leafSat
 	}
 let controlLeaf = L.control.layers(baseMaps,).addTo(map);
-map.zoomControl.setPosition('bottomleft')
+const ZoomBar = L.Control.extend({
+	options: {position: 'topleft'},
+	onAdd: function(){
+		const container = L.DomUtil.create('div','leaflet-bar leaflet-control')
+		const zoomIn = L.DomUtil.create('a','',container)
+		zoomIn.href = '#'
+		zoomIn.title = 'Приблизити'
+		zoomIn.innerHTML = '+'
+		const zoomOut = L.DomUtil.create('a','',container)
+		zoomOut.href = '#'
+		zoomOut.title = 'Віддалити'
+		zoomOut.innerHTML = '&minus;'
+		const zoomHome = L.DomUtil.create('a','',container)
+		zoomHome.href = '#'
+		zoomHome.title = 'Домой'
+		zoomHome.innerHTML = '<img src="leaflet/images/zoom-to-start-26.png" alt="Домой" width="20" height="20">'
+		const stop = L.DomEvent.stopPropagation
+		const prevent = L.DomEvent.preventDefault
+		L.DomEvent.on(zoomIn,'click', stop).on(zoomIn,'click', prevent).on(zoomIn,'click', ()=>map.zoomIn())
+		L.DomEvent.on(zoomOut,'click', stop).on(zoomOut,'click', prevent).on(zoomOut,'click', ()=>map.zoomOut())
+		L.DomEvent.on(zoomHome,'click', stop).on(zoomHome,'click', prevent).on(zoomHome,'click', ()=>map.setView(defaultView.center, defaultView.zoom))
+		return container
+	}
+})
+map.addControl(new ZoomBar())
 controlLeaf.setPosition('topleft')
+elemID('btnSidebarToggle').onclick = toggleSidebar
+elemID('pnlInfoClose').onclick = closeInfoPanel
 let selectMarker
 const Icons = {
 	icoReserveOff: L.icon({
@@ -401,29 +455,6 @@ funcByClass ('filter', function(){
 	checkLayerVisible()
 	})
 //=====================================================================
-//              		COLLAPSE & EXPAND FILTER-PANEL
-//=====================================================================
-elemID('pnlFilterHead').onclick = ()=> {
-	if(elemID('pnlFilter').classList.contains('pnlFilterCollapse')){
-		changeClass('pnlLeft', 'pnlLeftClose', 'pnlLeftOpen')
-		changeClass('pnlFilter', 'pnlFilterCollapse', 
-													'pnlFilterExpand')
-		changeClass('pnlFilterHead', 'pnlFilterHeadCollapse', 
-												'pnlFilterHeadExpand')
-		changeClass('pnlFilterBody', 'visOff', 'visOn')
-		changeClass('pnlInfo', 'pnlInfoTop', 'pnlInfoBottom')		
-		}else{
-			changeClass('pnlFilter', 'pnlFilterExpand', 
-												'pnlFilterCollapse')
-			changeClass('pnlFilterHead', 'pnlFilterHeadExpand', 
-											'pnlFilterHeadCollapse')
-			changeClass('pnlFilterBody', 'visOn', 'visOff')
-			changeClass('pnlInfo', 'pnlInfoBottom', 'pnlInfoTop')
-			if(!keepCLASS('pnlInfo', 'pnlInfoBottom')){changeClass('pnlLeft', 'pnlLeftOpen', 'pnlLeftClose')}
-		//			
-			}
-	}
-//=====================================================================
 //            				 CREATE MARKERS
 //=====================================================================
 function createMarkerLayer(arr, text, layer, onOff){
@@ -496,14 +527,11 @@ function markerOnClick(e){
 								"пам'ятка монументального мистецтва")
 				selectedMarkers(data[i], "пам'ятка археології")
 				selectedMarkers(data[i], 
-							"Парк-пам'ятка садово-паркового мистецтва")
+								"Парк-пам'ятка садово-паркового мистецтва")
 				selectedMarkers(data[i], "Пам'ятка архітектури")							
-													
-				changeClass('pnlLeft', 'pnlLeftClose', 'pnlLeftOpen')
+														
+				closeSidebar()
 				changeClass('pnlInfo', 'visOff', 'visOn')
-				changeClass('pnlFilterBody', 'visOff', 'visOn')
-				changeClass('pnlFilterHead', 'pnlFilterHeadCollapse', 
-												'pnlFilterHeadExpand')
 				elemID('pnlInfoBody').innerHTML = '<H3>'+ data[i].name + 
 								'</H3>' + '<p>' + '<H4>' + 
 								data[i].time + '</H4>' + '<p>' + 
@@ -522,12 +550,11 @@ function markerOnClick(e){
 //            			CLICK ON THE MAP
 //=====================================================================	
 map.on('click', function(e){
+	if(keepCLASS('pnlLeft','pnlLeftOpen')){
+		return
+		}
 	map.removeLayer(selectMarker)
-    changeClass('pnlLeft', 'pnlLeftOpen', 'pnlLeftClose')
-    changeClass('pnlInfo', 'visOn', 'visOff')
-    changeClass('pnlFilter', 'pnlFilterExpand', 'pnlFilterCollapse')
-    changeClass('pnlFilterBody', 'visOn', 'visOff')
-    changeClass('pnlFilterHead', 'pnlFilterHeadExpand', 
-											'pnlFilterHeadCollapse')
-    elemID('pnlFilterHead').innerHTML = 'Фильтр'
+	closeSidebar()
+	closeInfoPanel()
+	changeClass('pnlFilterBody', 'visOn', 'visOff')
 });
