@@ -212,4 +212,21 @@ body {
 	background: var(--clBtnHover);
 	color: var(--clBlack);
 	}
+@media (max-width: 768px){
+	.pnlLeftOpen{
+		width: 50vw;
+		min-width: 0;
+		}
+	#pnlInfo{
+		top: 80px;
+		width: 50vw;
+		max-width: none;
+		}
+	#pnlTop{
+		height: 80px;
+		}
+	#map{
+		height: calc(100vh - 80px);
+		}
+}
 /* ================================================================= */	
